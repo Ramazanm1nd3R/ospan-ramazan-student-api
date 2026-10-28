@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'kz.ospan'
-version = '1.0'
+version = '1.1'
 description = 'Student API by Ramazan Ospan (IT2-2310)'
 
 java {

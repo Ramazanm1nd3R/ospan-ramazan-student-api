@@ -1,0 +1,47 @@
+# Student API + PostgreSQL. Run: docker compose up -d --build
+# Secrets come from .env (not in Git); see .env.example
+name: ospan-ramazan-student-api
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: ospan-ramazan-postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    image: ospan-ramazan-student-api:${APP_TAG:-v1.0-ospan-ramazan}
+    container_name: ospan-ramazan-app
+    environment:
+      # "db" is the Compose service name: containers find each other by name on the network
+      DB_URL: jdbc:postgresql://db:5432/${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+    name: ospan-ramazan-pgdata
+
+networks:
+  backend:
+    name: ospan-ramazan-net

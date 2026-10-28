@@ -1,0 +1,16 @@
+# Gradle and IDE
+.gradle/
+build/
+.idea/
+*.iml
+
+# secrets: never commit them
+.env
+
+# output of the Linux part
+logs/*
+!logs/.gitkeep
+backups/*
+!backups/.gitkeep
+
+.DS_Store

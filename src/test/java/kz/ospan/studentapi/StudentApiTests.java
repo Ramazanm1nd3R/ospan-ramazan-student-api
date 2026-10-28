@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -51,6 +52,18 @@ class StudentApiTests {
 		mvc.perform(get(URL))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$[*].email", org.hamcrest.Matchers.hasItem("create@ospan.kz")));
+	}
+
+	@Test
+	void updateStudent() throws Exception {
+		String location = create("update@ospan.kz");
+		String body = """
+				{"firstName":"Ramazan","lastName":"Ospan","email":"update@ospan.kz","groupName":"IT2-2310 (DevOps)"}""";
+		mvc.perform(put(location).contentType(MediaType.APPLICATION_JSON).content(body))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.groupName").value("IT2-2310 (DevOps)"));
+		mvc.perform(put(URL + "/999999").contentType(MediaType.APPLICATION_JSON).content(body))
+				.andExpect(status().isNotFound());
 	}
 
 	@Test

@@ -39,7 +39,7 @@ class StudentApiTests {
 		mvc.perform(get("/"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.student").value("Ramazan Ospan"))
-				.andExpect(jsonPath("$.group").value("IT2-9999"));
+				.andExpect(jsonPath("$.group").value("IT2-2310"));
 	}
 
 	@Test

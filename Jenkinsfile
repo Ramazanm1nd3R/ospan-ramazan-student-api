@@ -21,6 +21,8 @@ pipeline {
                 script {
                     env.APP_VERSION = sh(returnStdout: true, script: "grep -E \"^version = \" build.gradle | cut -d\"'\" -f2").trim()
                     env.IMAGE_TAG = "v${env.APP_VERSION}-ospan-ramazan"
+                    // branch + build number: builds of different branches can run at the same time
+                    env.CI_NET = "ospan-ramazan-ci-${env.BRANCH_NAME.replaceAll('[^A-Za-z0-9]', '-')}-${env.BUILD_NUMBER}"
                 }
                 echo "Student: ${STUDENT} (${GROUP})"
                 echo "Branch: ${env.BRANCH_NAME}, version ${env.APP_VERSION}, image ${IMAGE_NAME}:${env.IMAGE_TAG}"
@@ -56,7 +58,7 @@ pipeline {
                                                   usernameVariable: 'DB_USER', passwordVariable: 'DB_PASSWORD')]) {
                     sh '''
                         set -e
-                        NET=ospan-ramazan-ci-${BUILD_NUMBER}
+                        NET=$CI_NET
                         docker network create $NET
                         docker run -d --name $NET-db --network $NET -e POSTGRES_DB=students \
                           -e POSTGRES_USER="$DB_USER" -e POSTGRES_PASSWORD="$DB_PASSWORD" postgres:16-alpine
@@ -77,7 +79,7 @@ pipeline {
             post {
                 always {
                     sh '''
-                        NET=ospan-ramazan-ci-${BUILD_NUMBER}
+                        NET=$CI_NET
                         docker logs --tail 5 $NET-app 2>/dev/null || true
                         docker rm -f $NET-app $NET-db > /dev/null 2>&1 || true
                         docker network rm $NET > /dev/null 2>&1 || true

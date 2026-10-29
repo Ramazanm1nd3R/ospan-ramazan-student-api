@@ -33,3 +33,6 @@ curl http://localhost:8080/   # shows the student name and the application versi
 
 `Jenkinsfile` runs Checkout → Build → Test → Docker Build → Verify on Jenkins job `Ospan_Ramazan_Student_API`.
 The Jenkins controller itself is described in `ci/jenkins` (plugins and configuration as code).
+
+Jenkins polls GitHub every 2 minutes (`pollSCM`), so every push to `main` or a `test/*` branch starts the pipeline automatically.
+Failed builds stop at the failing stage: no Docker image is built from code whose tests fail.
